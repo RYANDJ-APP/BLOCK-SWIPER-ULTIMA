@@ -39,11 +39,11 @@ button.btn-accent{background: linear-gradient(135deg, var(--navy), var(--magenta
 button.btn-green{background: linear-gradient(135deg, var(--green-dark), var(--green-light), var(--gold));}
 button.btn-danger{background: linear-gradient(135deg, #2a0a0f, var(--maroon));}
 .game-wrapper{display:none; flex-direction:column; align-items:center; justify-content:center; width:100%; max-width:1120px; height:100dvh; padding:10px; touch-action:none; position:relative;}
-.header{display:flex; justify-content:space-between; align-items:center; width:100%; margin-bottom:10px; gap:6px; flex-wrap:wrap;}
+.header{display:flex; justify-content:space-between; align-items:center; width:100%; margin-bottom:10px; gap:6px; flex-wrap:wrap; min-width:0;}
 .title-box h2{margin:0; font-family:'Cinzel',serif; font-size:17px; color:var(--gold-light);} 
 .title-box p{margin:2px 0 0 0; font-size:11px; color:var(--silver);}
 .score-box{background:linear-gradient(145deg,rgba(0,0,0,.82),rgba(94,16,26,.72)); padding:6px 18px; border-radius:14px; font-family:'Cinzel',serif; font-size:28px; font-weight:800; color:var(--gold-light); border:2px solid rgba(212,175,55,.7); min-width:104px; text-align:center; text-shadow:0 2px 0 #000,0 0 12px rgba(212,175,55,.65); box-shadow:0 8px 20px rgba(0,0,0,.4);}
-.controls{display:flex; gap:6px; align-items:center;}
+.controls{display:flex; gap:6px; align-items:center; flex-wrap:wrap; justify-content:flex-end; min-width:0;}
 .menu-toggle{background:rgba(15,30,58,0.8); border:1px solid rgba(212,175,55,0.45); padding:7px 10px; border-radius:8px; cursor:pointer; font-weight:700; color:var(--white); font-size:11px;}
 .reset-toggle{background:rgba(94,16,26,0.7); border:1px solid rgba(212,175,55,0.45); padding:7px 10px; border-radius:8px; cursor:pointer; font-weight:700; color:var(--white); font-size:11px;}
 .toggle{display:flex; align-items:center; gap:5px; background: rgba(0,0,0,0.5); border:1px solid rgba(212,175,55,0.3); border-radius:20px; padding:5px 10px; font-size:11px; color:var(--silver); cursor:pointer;}
@@ -79,8 +79,8 @@ button.btn-danger{background: linear-gradient(135deg, #2a0a0f, var(--maroon));}
 .shape-cell.filled.c-magenta{background: linear-gradient(135deg, var(--magenta-light), var(--magenta));}
 .shape-cell.filled.c-gold{background: linear-gradient(135deg, var(--gold-light), var(--gold));}
 .shape-cell.filled.c-silver{background: linear-gradient(135deg, #e8eaed, #a0a6ab);}
-.dragging{cursor:grabbing !important; filter: drop-shadow(0 12px 18px rgba(0,0,0,0.6)) brightness(1.15); z-index:9999; opacity:0.92;}
-.dragging.smart-snapped{filter: drop-shadow(0 0 16px var(--gold)) brightness(1.3); transform: scale(1.06);}
+.dragging{cursor:grabbing !important; filter:none; z-index:9999; opacity:0.92;}
+.dragging.smart-snapped{filter:none; transform: scale(1.06);}
 .btn-auto{display:none;}
 .btn-auto:disabled{opacity:0.35; cursor:not-allowed;}
 #floating-hud{position:fixed; left:10px; top:68px; background: rgba(0,0,0,0.52); backdrop-filter: blur(12px); padding:9px 12px; border-radius:12px; border:1px solid rgba(212,175,55,0.28); z-index:1000; display:none; min-width:132px;}
@@ -150,11 +150,15 @@ backdrop-filter: blur(6px);
     .tray{left:auto; right:8px; width:112px; min-width:112px;}
 }
 @media (max-width:900px){
+    .game-wrapper{padding:6px;}
+    .header{align-items:flex-start; margin-bottom:5px;}
+    .title-box{min-width:0; flex:1 1 130px;}
+    .controls{flex:1 1 100%; justify-content:center; gap:4px;}
     .modal-screen, .tray, #floating-hud, #welcome-screen .sub{backdrop-filter:none; -webkit-backdrop-filter:none;}
     #board{box-shadow:0 10px 28px rgba(0,0,0,0.65);}
     .cell.filled{box-shadow:inset 0 1px 0 rgba(255,255,255,0.18);}
     .landing-art{filter:none;}
-    .dragging{filter:brightness(1.1);}
+    .dragging{filter:none;}
 }
 
 </style>
@@ -182,7 +186,7 @@ backdrop-filter: blur(6px);
 <div class="controls">
 <div class="score-box" id="score">0</div>
 <label class="toggle"><input type="checkbox" id="smart-toggle" onchange="toggleSmart()"><span>Smart Gap</span></label>
-<label class="tts-control" title="Kecepatan suara"><span>🔊</span><input id="tts-rate" type="range" min="0.7" max="1.3" step="0.05" value="0.95" aria-label="Kecepatan suara"></label>
+<label class="tts-control" title="Kecepatan suara"><span>🔊</span><input id="tts-rate" type="range" min="0.7" max="2" step="0.05" value="1.15" aria-label="Kecepatan suara"></label>
 <button type="button" class="menu-toggle" onclick="backToMenu()">⌂ Menu</button>
 <button type="button" class="reset-toggle" onclick="resetGame()">↻ Reset</button>
 <button type="button" class="fs-toggle" onclick="toggleFullscreen()">⛶ Full</button>
@@ -209,7 +213,7 @@ backdrop-filter: blur(6px);
 <script>
 const BOARD_SIZE=10;
 let board=[], boardColors=[], score=0, playerName="Guest", currentLevel="easy", audioCtx=null;
-let isSmartOn=false, fullscreenLocked=true, ttsRate=0.95;
+let isSmartOn=false, fullscreenLocked=true, ttsRate=1.15;
 const SHAPES_ALL=[ [[1]], [[1,1]], [[1],[1]], [[1,1,1]], [[1],[1],[1]], [[1,1,1,1]], [[1],[1],[1],[1]], [[1,1,1,1,1]], [[1],[1],[1],[1],[1]], [[1,1],[1,1]], [[1,1,1],[1,1,1],[1,1,1]], [[1,1],[1,0]], [[1,1],[0,1]], [[1,0],[1,1]], [[0,1],[1,1]], [[1,1,1],[1,0,0],[1,0,0]], [[1,1,1],[0,0,1],[0,0,1]], [[1,0,0],[1,0,0],[1,1,1]], [[0,0,1],[0,0,1],[1,1,1]] ];
 const COLOR_CLASSES=['c-maroon','c-navy','c-green','c-magenta','c-gold','c-silver'];
 let currentShapes=[null,null,null];
@@ -217,7 +221,7 @@ let activeDragShape=-1, dragGhost=null, currentHoverR=-1, currentHoverC=-1, smar
 let bestPlacements=[null,null,null];
 function initAudio(){ if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)(); if(audioCtx.state==='suspended') audioCtx.resume(); }
 function playGameOverBuzz(){ if(!audioCtx) return; try{ const now=audioCtx.currentTime; const master=audioCtx.createGain(); master.gain.setValueAtTime(0.0001,now); master.gain.exponentialRampToValueAtTime(0.22,now+0.03); master.gain.exponentialRampToValueAtTime(0.0001,now+1.15); master.connect(audioCtx.destination); for(let i=0;i<3;i++){ const o=audioCtx.createOscillator(); o.type='sawtooth'; o.frequency.setValueAtTime(125-i*15,now+i*0.18); o.frequency.linearRampToValueAtTime(55-i*7,now+i*0.18+0.15); o.connect(master); o.start(now+i*0.18); o.stop(now+i*0.18+0.18); } }catch(e){} }
-function announceSuccess(lines){ const words=lines>=3?'SUPER!':lines===2?'HEBAT!':'BAGUS!'; const phrases=lines>=3?'Luar biasa! Super sekali!':lines===2?'Hebat! Dua garis sekaligus!':'Bagus! Garisnya bersih!'; const notification=document.createElement('div'); notification.className='success-notification'; notification.textContent=words; document.body.appendChild(notification); setTimeout(()=>notification.remove(),1400); if('speechSynthesis' in window){ window.speechSynthesis.cancel(); const speech=new SpeechSynthesisUtterance(phrases); speech.lang='id-ID'; speech.rate=ttsRate; speech.pitch=1.18; speech.volume=1; window.speechSynthesis.speak(speech); } }
+function announceSuccess(lines){ const words=lines>=3?'SUPER!':lines===2?'HEBAT!':'BAGUS!'; const phrases=lines>=3?'Luar biasa! Super sekali!':lines===2?'Hebat! Dua garis sekaligus!':'Bagus! Garisnya bersih!'; const notification=document.createElement('div'); notification.className='success-notification'; notification.textContent=words; document.body.appendChild(notification); setTimeout(()=>notification.remove(),1400); if('speechSynthesis' in window){ window.speechSynthesis.cancel(); const speech=new SpeechSynthesisUtterance(phrases); speech.lang='id-ID'; speech.rate=Math.min(2,Math.max(0.7,ttsRate)); speech.pitch=lines>=3?1.35:lines===2?1.25:1.15; speech.volume=1; window.speechSynthesis.speak(speech); } }
 function enterFullscreen(){ if(fullscreenLocked && !document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(()=>{}); }
 function toggleFullscreen(){ fullscreenLocked=!fullscreenLocked; if(fullscreenLocked) enterFullscreen(); else if(document.fullscreenElement) document.exitFullscreen?.(); }
 document.addEventListener('fullscreenchange',()=>{ if(fullscreenLocked && !document.fullscreenElement) setTimeout(enterFullscreen,120); });
